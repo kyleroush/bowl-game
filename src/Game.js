@@ -167,7 +167,6 @@ class Game extends React.Component {
         </Fab>
       </div>
     )
-    
   }
 
   resetSession = () => {
@@ -196,7 +195,6 @@ class Game extends React.Component {
         </Fab>
       </div>
     )
-    
   }
 
   render() {
@@ -214,8 +212,3 @@ class Game extends React.Component {
   }
 }
 export default Game;
-
-
-
-// add words
-// get a word
