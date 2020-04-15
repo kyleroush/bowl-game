@@ -9,7 +9,8 @@ class App extends React.Component {
     super(props);
     this.state = {
       session: null,
-      player: null
+      player: null,
+      warning: "",
     };
   }
 
@@ -20,12 +21,12 @@ class App extends React.Component {
 
 
   render() {
-    var {session, player} = this.state;
+    var {session, player, warning} = this.state;
 
     return (
       <div>
         {session == null && <SessionsPage setAppState={this.setValue}/>}
-        {session != null && player == null && <PlayersPage session={session} setAppState={this.setValue}/>}
+        {session != null && player == null && <PlayersPage session={session} setAppState={this.setValue} warning={warning} />}
         {session != null && player != null && <Game session={session} player={player} wordCount={3}/>}
       </div>
     )

@@ -63,7 +63,7 @@ class Game extends React.Component {
       if (doc.exists) {
         console.log("Document data:", doc.data().players);
 
-        gottenWords.concat(doc.data().gottenWords)
+        gottenWords = gottenWords.concat(doc.data().gottenWords)
 
         for (const player in doc.data().players) {
           var playerObj = doc.data().players[player];
@@ -106,8 +106,26 @@ class Game extends React.Component {
     })
   }
 
+  finalWord = () => {
+    var {gottenWords, doc, currentWord} = this.state;
+    var {session} = this.props;
+    gottenWords.push(currentWord)
+
+    var newGottenWords = gottenWords.concat(doc.gottenWords);
+
+    firestore.collection('BowlGame').doc(session).update({
+      gottenWords: newGottenWords
+    });
+    // upload gotten words
+    this.setState({
+      yourTurn: false,
+      aviableWords: [],
+      currentWord: null,
+      gottenWords: []
+    })
+  }
+
   finishTurn = () => {
-    
     var {gottenWords, doc} = this.state;
     var {session} = this.props;
 
@@ -151,9 +169,15 @@ class Game extends React.Component {
           </CardContent>
         </Card>
 
-        {aviableWords.length !==0 && <Fab variant="extended" color="primary" aria-label="join" onClick={this.nextWord}>
-          Gotten Word
-        </Fab>}
+        {
+          aviableWords.length !==0? 
+            <Fab variant="extended" color="primary" aria-label="join" onClick={this.nextWord}>
+              Gotten Word
+            </Fab>: 
+            <Fab variant="extended" color="primary" aria-label="join" onClick={this.finalWord}>
+              Gotten Final Word
+            </Fab>
+        }
         <Fab variant="extended" color="primary" aria-label="join" onClick={this.finishTurn}>
           End Turn
         </Fab>
@@ -162,11 +186,39 @@ class Game extends React.Component {
   }
 
   resetSession = () => {
+    var {session} = this.props;
+    var {doc} = this.state;
+    var update = {};
 
-    // make a request to reset game
+    for (const player in doc.players) {
+      update[player] = {}
+    }
+
+    firestore.collection('BowlGame').doc(session).update({
+      gottenWords: [],
+      players: update
+    });
 
     this.setState({
       addingWords: true,
+      words: null,
+      yourTurn: false,
+      aviableWords: [],
+      currentWord: null,
+      gottenWords: []
+    });
+  }
+
+  reuseWords = () => {
+    var {session} = this.props
+
+    // make a request to reset game
+    firestore.collection('BowlGame').doc(session).update({
+      gottenWords: []
+    });
+
+    this.setState({
+      addingWords: false,
       words: null,
       yourTurn: false,
       aviableWords: [],
@@ -179,10 +231,10 @@ class Game extends React.Component {
     return(
       <div>
         <Divider />
-        <Fab variant="extended" color="secondary" aria-label="join">
+        <Fab variant="extended" color="secondary" aria-label="join" onClick={this.reuseWords} >
           Put words back in bowl
         </Fab>
-        <Fab variant="extended" color="secondary" aria-label="join" onClick={this.resetSession}>
+        <Fab variant="extended" color="secondary" aria-label="join" onClick={this.resetSession} >
           End Game and start new?
         </Fab>
       </div>
