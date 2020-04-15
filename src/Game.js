@@ -1,10 +1,6 @@
 import React from 'react';
 import {TextField, List, ListItem, ListItemText, Fab, Card, CardContent, Typography, Divider} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
 import firestore from './firestore';
-
-
-
 
 class Game extends React.Component {
 
@@ -19,7 +15,6 @@ class Game extends React.Component {
       gottenWords: []
     }
   }
-
 
   onAddWords = () => {
     var {wordCount, player, session} = this.props;
@@ -36,8 +31,6 @@ class Game extends React.Component {
         words: words, 
         addingWords: false,
       });
-
-    //  upload words
   }
 
   renderAddWords() {
@@ -57,8 +50,8 @@ class Game extends React.Component {
         </List>
       </div>
       );
-
   }
+
   yourTurn= () => {
     var { session } = this.props;
     var that = this;
@@ -96,7 +89,6 @@ class Game extends React.Component {
         console.log("No such document!");
       }
     });  
-
   }
 
   nextWord = () => {
