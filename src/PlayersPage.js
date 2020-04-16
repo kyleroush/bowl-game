@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import firestore from './firestore';
+import {db} from './firestore';
 
 const useStyles = makeStyles((theme) => ({
   margin: {
@@ -19,13 +19,14 @@ const useStyles = makeStyles((theme) => ({
 function PlayersPage(props) {
 
   const setPlayer = ()=> {
-    // console.log(" ")
+    var {session} = props;
     var name = document.getElementById("name").value;
 
+    db.ref(`BowlGame/${session}/players/${name}`).update({
+      name,
+      words: []
+    })
 
-    var update = {};
-    update[`players.${name}`] = {}
-    firestore.collection('BowlGame').doc(props.session).update(update);
     props.setAppState({player: name});
   };
   return (

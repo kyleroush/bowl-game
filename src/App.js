@@ -21,13 +21,14 @@ class App extends React.Component {
 
 
   render() {
-    var {session, player, warning} = this.state;
+    var {session, player, warning, wordsPerPerson} = this.state;
 
     return (
       <div>
+        <h1>The Bowl Game</h1>
         {session == null && <SessionsPage setAppState={this.setValue}/>}
         {session != null && player == null && <PlayersPage session={session} setAppState={this.setValue} warning={warning} />}
-        {session != null && player != null && <Game session={session} player={player} wordCount={3}/>}
+        {session != null && player != null && <Game session={session} player={player} wordCount={wordsPerPerson}/>}
       </div>
     )
     // if (session == null) {

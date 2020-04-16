@@ -1,13 +1,10 @@
 import React from 'react';
-import TextField from '@material-ui/core/TextField';
-import Fab from '@material-ui/core/Fab';
+import {TextField, Fab, Divider, Typography} from '@material-ui/core/';
 import { makeStyles } from '@material-ui/core/styles';
-import Divider from '@material-ui/core/Divider';
-import Typography from '@material-ui/core/Typography';
 
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import firestore from './firestore';
+import {db} from './firestore';
 
 const useStyles = makeStyles((theme) => ({
   margin: {
@@ -23,10 +20,15 @@ function SessionsPage(props) {
   const setSession = ()=> {
     var session = document.getElementById("session").value;
 
-    firestore.collection('BowlGame').doc(session).get().then(function(doc) {
+    db.ref(`BowlGame/${session}`).once("value", snapshot => {
 
-      if (doc.exists) {
-        props.setAppState({session: session});
+      if (snapshot.val() !== null ) {
+        var wordsPerPerson = snapshot.val().wordsPerPerson;
+        props.setAppState(
+          {
+            session,
+            wordsPerPerson
+          });
       }else {
         props.setAppState({warning: "this session doesnt exist"});
       }
@@ -37,31 +39,27 @@ function SessionsPage(props) {
   const createSession = ()=> {
 
     var session = document.getElementById("session").value;
-    var doc;
+    var wordsPerPerson = parseInt(document.getElementById("words-per-person").value);
     if (session === "") {
-      doc = firestore.collection('BowlGame').doc();
-      session = doc.id;
-
-      doc.set({
-        players: {},
-        gottenWords: []
-      })
-
-      props.setAppState({session: session});
-    } else {
-
-      firestore.collection('BowlGame').doc(session).get()
-        .then(function(doc) {
-          if (!doc.exists) {
-            doc = firestore.collection('BowlGame').doc(session);
-            props.setAppState({session: session});
-            doc.set({
-              players: {},
-              gottenWords: []
-            })
-          }
-        });
+      session = Math.random().toString(36).substring(2, 10);
     }
+    db.ref(`BowlGame/${session}`).once("value", snapshot => {
+
+      if (snapshot.val()===null) {
+        db.ref(`BowlGame/${session}`).update({
+          players: {},
+          gottenWords: [],
+          wordsPerPerson
+        });
+
+        props.setAppState(
+          {
+            session: session,
+            wordsPerPerson
+          });
+        }
+    });
+    
   };
   return (
     <List>
@@ -75,14 +73,17 @@ function SessionsPage(props) {
       <ListItem>
         <TextField id="session" label="Session" variant="outlined" />
       </ListItem>
-      <Divider />
       <ListItem>
         <Fab variant="extended" color="primary" aria-label="create" className={useStyles().margin} onClick={createSession}>
-          Create Session
+          Create Bowl Game Session
         </Fab>
         <Fab variant="extended" color="primary" aria-label="join" className={useStyles().margin} onClick={setSession}>
-          Join Session
+          Join Bowl Game Session
         </Fab>
+      </ListItem>
+      <Divider />
+      <ListItem>
+        <TextField id="words-per-person" label="# of words" variant="outlined" defaultValue={3} helperText="number of words per person"/>
       </ListItem>
     </List>
   );
