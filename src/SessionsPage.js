@@ -49,7 +49,8 @@ function SessionsPage(props) {
         db.ref(`BowlGame/${session}`).update({
           players: {},
           gottenWords: [],
-          wordsPerPerson
+          wordsPerPerson,
+          globalGameState: "waiting",
         });
 
         props.setAppState(

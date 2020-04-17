@@ -24,7 +24,8 @@ function PlayersPage(props) {
 
     db.ref(`BowlGame/${session}/players/${name}`).update({
       name,
-      words: []
+      words: [],
+      ready: false
     })
 
     props.setAppState({player: name});

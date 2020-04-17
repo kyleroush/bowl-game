@@ -10,9 +10,7 @@ class Game extends React.Component {
     super(props);
     this.state = {
       gameState: "addingWords",
-      addingWords: true,
       words: null,
-      yourTurn: false,
       aviableWords: [],
       currentWord: null,
       gottenWords: [],
@@ -22,8 +20,9 @@ class Game extends React.Component {
 
     this.gameStates = {
       addingWords: "addingWords",
-      readying: "readying",
-      playing: "playing"
+      yourTurn: "yourTurn",
+      postTurn: "postTurn",
+      waiting: "waiting",
     }
   }
 
@@ -40,14 +39,14 @@ class Game extends React.Component {
 
   onAddWords = () => {
     var {wordCount, player, session} = this.props;
-    var words = Array(wordCount).fill().map((_, i) => document.getElementById(`word-${i}`).value);
+    var words = Array(wordCount).fill().map((_, i) => document.getElementById(`word-${i}`).value).filter(word => word !== "");
     // filter out bad words
 
     db.ref(`BowlGame/${session}/players/${player}`).update({
       name: player,
       words
     })
-    this.setState({gameState: this.gameStates.playing});
+    this.setState({gameState: this.gameStates.waiting});
   }
 
   renderAddWords() {
@@ -62,8 +61,8 @@ class Game extends React.Component {
         </List>
         <Fab variant="extended" color="primary" aria-label="join" onClick={this.onAddWords}>
           Add Words
-        </Fab>: 
-        <Fab variant="extended" color="primary" aria-label="join" onClick={() => this.setState({gameState: this.gameStates.playing})}>
+        </Fab>
+        <Fab variant="extended" color="primary" aria-label="join" onClick={() => this.setState({gameState: this.gameStates.waiting})}>
           Skip Adding words
         </Fab>
       </div>
@@ -80,7 +79,8 @@ class Game extends React.Component {
 
     for (const player in snapshot.players) {
       var playerObj = snapshot.players[player];
-      aviableWords = aviableWords.concat(playerObj.words)
+      if(playerObj.words !== undefined)
+        aviableWords = aviableWords.concat(playerObj.words)
     }
 
     aviableWords = aviableWords.filter(n => !gottenWords.includes(n));
@@ -90,7 +90,7 @@ class Game extends React.Component {
     aviableWords.splice(loc, 1);
     
     that.setState({
-      yourTurn: true,
+      gameState: this.gameStates.yourTurn,
       aviableWords: aviableWords,
       currentWord: currentWord,
       gottenWords: [],
@@ -124,10 +124,10 @@ class Game extends React.Component {
     });
     // upload gotten words
     this.setState({
-      yourTurn: false,
+      gameState: this.gameStates.postTurn,
       aviableWords: [],
       currentWord: null,
-      gottenWords: []
+      gottenWords: gottenWords
     })
   }
 
@@ -147,14 +147,54 @@ class Game extends React.Component {
     });
     // upload gotten words
     this.setState({
-      yourTurn: false,
+      gameState: this.gameStates.postTurn,
       aviableWords: [],
-      currentWord: null,
-      gottenWords: []
+      currentWord: null
     })
   }
 
+  renderGottenWords = () => {
+    var {gottenWords} = this.state;
+    return (
+      <List>
+        <ListItem >
+              <ListItemText>
+                The words you got are
+              </ListItemText>
+            </ListItem>
+       {
+        gottenWords.map(word => {
+          return (
+            <ListItem key={word}>
+              <ListItemText>
+                {word}
+              </ListItemText>
+            </ListItem>)
+          })
+        }
+        <ListItem>
+          <Fab variant="extended" color="primary" aria-label="join" onClick={() => this.setState({gameState: this.gameStates.waiting, gottenWords:[]})}>
+            Finished
+          </Fab>
+        </ListItem>
+      </List>
+    )
+  }
+
   renderStartTurn() {
+    var {snapshot} = this.state
+    var aviableWords =[];
+
+    for (const player in snapshot.players) {
+      var playerObj = snapshot.players[player];
+      if(playerObj.words !== undefined)
+        aviableWords = aviableWords.concat(playerObj.words)
+    }
+
+    aviableWords = aviableWords.filter(n => !this.getSnapshotGottenWords().includes(n));
+    if (aviableWords.length ===0) {
+      return;
+    }
 
     return (
       <div>
@@ -167,6 +207,7 @@ class Game extends React.Component {
 
   renderDuringTurn = () => {
     var {currentWord, aviableWords} = this.state;
+
     return(
       <div>
         <Card>      
@@ -203,21 +244,22 @@ class Game extends React.Component {
 
     for (const player in snapshot.players) {
       update[player] = {
-        name: player
+        name: player,
+        ready: false
       }
     }
 
     db.ref(`BowlGame/${session}`).update({
       gottenWords: [],
-      players: update
+      players: update,
+      globalGameState: "waiting",
     });
 
     this.setState({
-      addingWords: true,
-      yourTurn: false,
+      gameState: this.gameStates.addingWords,
       aviableWords: [],
       currentWord: null,
-      gottenWords: []
+      gottenWords: [],
     });
   }
 
@@ -230,29 +272,54 @@ class Game extends React.Component {
     });
 
     this.setState({
-      addingWords: false,
-      yourTurn: false,
+      gameState: this.gameStates.waiting,
       aviableWords: [],
       currentWord: null,
       gottenWords: []
     });
   }
 
-  markReady = () => {
+  toggleReady = () => {
     var {session, player} = this.props
     var {snapshot} = this.state
 
     var update = snapshot.players[player];
-    update.ready = true; 
+    update.ready = !update.ready; 
 
     db.ref(`BowlGame/${session}/players/${player}`).update(update)
   }
 
+  startGame = () => {
+    var {session} = this.props
+
+    db.ref(`BowlGame/${session}`).update({
+      globalGameState: "playing"
+    })
+  }
+
+  kickPlayer = (player) => {
+    var {session} = this.props
+    var {players} = this.state.snapshot
+
+    players[player] = {}
+
+
+    db.ref(`BowlGame/${session}/players/`).update(players)
+  }
+
   renderReady = () => {
+    var {player} = this.props
+    var {snapshot} = this.state
     return (
-      <Fab variant="extended" color="secondary" aria-label="join" onClick={this.markReady} >
-        Ready to start
-      </Fab>);
+      <div>
+        <Fab variant="extended" color="secondary" aria-label="join" onClick={this.toggleReady} >
+          {!snapshot.players[player].ready? "Ready to start": "Not Ready"}
+        </Fab>
+        {snapshot.players[player].ready && <Fab variant="extended" color="secondary" aria-label="join" onClick={this.startGame} >
+          Start Game 
+        </Fab>}
+      </div>
+      );
   }
 
   renderPlayers = () => {
@@ -279,9 +346,19 @@ class Game extends React.Component {
               Object.keys(snapshot.players).map((key) => {
                 return(<ListItem key={key}>
                   <ListItemText>
-                    player: {key} {snapshot.players[key].words !== undefined? "words submitted" : "needs to submit words"}
+                    player: {key}
                   </ListItemText>
-                </ListItem>)
+                  <ListItemText>
+                    {snapshot.globalGameState === "waiting" && snapshot.players[key].ready === true && `is ready`}
+                  </ListItemText>
+                  <ListItemText>
+                    {snapshot.players[key].team !== undefined && `is on team ${snapshot.players[key].team}`}
+                  </ListItemText>
+
+                  <Fab variant="extended" color="secondary" aria-label="join" onClick={() => this.kickPlayer(key)} >
+                    Kick Player from Game
+                  </Fab>
+                </ListItem>);
               })
             }
           </List>
@@ -305,19 +382,42 @@ class Game extends React.Component {
 
   render() {
     var {session, player} = this.props;
-    var {yourTurn, gameState} = this.state;
+    var {gameState, snapshot} = this.state;
+
+    if(snapshot === null) {
+      return (
+        <Typography>
+          ... Loading
+        </Typography>
+      )
+    }
 
     return (
       <div>
         <h1>Hello, {player}! You have joined {session}.</h1>
-        {gameState === this.gameStates.addingWords && this.renderAddWords()}
-        {gameState === this.gameStates.playing && (yourTurn? this.renderDuringTurn(): this.renderStartTurn())}
-        {gameState === this.gameStates.playing && !yourTurn && this.renderResets()}
-        {!yourTurn && this.renderPlayers()}
+        {snapshot.globalGameState === "waiting" 
+            && gameState === this.gameStates.addingWords 
+            && this.renderAddWords()}
+        {snapshot.globalGameState === "waiting" 
+            && gameState === this.gameStates.waiting 
+            && this.renderReady()}
+        {snapshot.globalGameState === "playing" 
+            && (gameState === this.gameStates.yourTurn 
+                  ? this.renderDuringTurn() 
+                  : this.renderStartTurn())}
+        {snapshot.globalGameState === "playing" 
+            && gameState === this.gameStates.waiting  
+            && this.renderResets()}
+        {snapshot.globalGameState === "playing" 
+            && gameState === this.gameStates.postTurn  
+            && this.renderGottenWords()}
+        {gameState === this.gameStates.waiting 
+            && this.renderPlayers()}
       </div>
     );
   }
 }
+
 export default Game;
 
 // teams
@@ -325,4 +425,6 @@ export default Game;
 // score
 // display words gotten
 // list players
+//      kick players
 // validation/warnings (player name, etc)
+//  refresh page/url
