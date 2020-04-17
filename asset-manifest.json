@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/bowl-game/static/css/main.5ecd60fb.chunk.css",
-    "main.js": "/bowl-game/static/js/main.4737df19.chunk.js",
-    "main.js.map": "/bowl-game/static/js/main.4737df19.chunk.js.map",
+    "main.js": "/bowl-game/static/js/main.dbc930b7.chunk.js",
+    "main.js.map": "/bowl-game/static/js/main.dbc930b7.chunk.js.map",
     "runtime-main.js": "/bowl-game/static/js/runtime-main.5a3e2bd1.js",
     "runtime-main.js.map": "/bowl-game/static/js/runtime-main.5a3e2bd1.js.map",
     "static/js/2.2ad031da.chunk.js": "/bowl-game/static/js/2.2ad031da.chunk.js",
     "static/js/2.2ad031da.chunk.js.map": "/bowl-game/static/js/2.2ad031da.chunk.js.map",
     "index.html": "/bowl-game/index.html",
-    "precache-manifest.7bfb24839d0cd5da27fbd8266de3fd5b.js": "/bowl-game/precache-manifest.7bfb24839d0cd5da27fbd8266de3fd5b.js",
+    "precache-manifest.9b8176c5c5c22c5d69f18906d61c6503.js": "/bowl-game/precache-manifest.9b8176c5c5c22c5d69f18906d61c6503.js",
     "service-worker.js": "/bowl-game/service-worker.js",
     "static/css/main.5ecd60fb.chunk.css.map": "/bowl-game/static/css/main.5ecd60fb.chunk.css.map",
     "static/js/2.2ad031da.chunk.js.LICENSE.txt": "/bowl-game/static/js/2.2ad031da.chunk.js.LICENSE.txt"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.5a3e2bd1.js",
     "static/js/2.2ad031da.chunk.js",
     "static/css/main.5ecd60fb.chunk.css",
-    "static/js/main.4737df19.chunk.js"
+    "static/js/main.dbc930b7.chunk.js"
   ]
 }
