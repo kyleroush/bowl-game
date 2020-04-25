@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "a10600d8a764234d0cf28bf70b0b12bd",
+    "revision": "7c6fa1000d03b30af5b36c7619b0409b",
     "url": "/bowl-game/index.html"
   },
   {
-    "revision": "455a701beb3a96a5b460",
+    "revision": "da9b7abef15ebad9d98f",
     "url": "/bowl-game/static/css/main.5ecd60fb.chunk.css"
   },
   {
-    "revision": "18a668e832fa6c10f953",
-    "url": "/bowl-game/static/js/2.66eb609a.chunk.js"
+    "revision": "117ea5cea64b4732d266",
+    "url": "/bowl-game/static/js/2.9911ab9f.chunk.js"
   },
   {
     "revision": "86414f6aa96d78f04460ff2dda206a29",
-    "url": "/bowl-game/static/js/2.66eb609a.chunk.js.LICENSE.txt"
+    "url": "/bowl-game/static/js/2.9911ab9f.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "455a701beb3a96a5b460",
-    "url": "/bowl-game/static/js/main.e5f15c8e.chunk.js"
+    "revision": "da9b7abef15ebad9d98f",
+    "url": "/bowl-game/static/js/main.5cbde8f1.chunk.js"
   },
   {
     "revision": "4feaf638f18abb4220cc",
