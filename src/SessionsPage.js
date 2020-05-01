@@ -29,6 +29,8 @@ function SessionsPage(props) {
             session,
             wordsPerPerson
           });
+          // History.push(`/bowl-game/${session}`)
+          window.history.pushState({},  session, `/bowl-game/${session}`)
       }else {
         props.setAppState({warning: "this session doesnt exist"});
       }
@@ -58,6 +60,8 @@ function SessionsPage(props) {
             session: session,
             wordsPerPerson
           });
+
+          window.history.pushState({},  session, `/bowl-game/${session}`)
         }
     });
     

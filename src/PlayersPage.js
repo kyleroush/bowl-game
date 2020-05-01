@@ -25,10 +25,12 @@ function PlayersPage(props) {
     db.ref(`BowlGame/${session}/players/${name}`).update({
       name,
       words: [],
-      ready: false
+      ready: false,
+      gameState: "addingWords",
     })
 
     props.setAppState({player: name});
+    window.history.pushState({},  session, `?player=${name}`)
   };
   return (
     <List>
